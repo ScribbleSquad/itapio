@@ -7,8 +7,8 @@ require 'digest/md5'
 require "pry"
 
 pubnub = Pubnub.new(
-    "pub-c9eb2a6e-6135-4553-831f-ecd45ce9ae15",  ## PUBLISH_KEY
-    "sub-977100a6-9762-11e1-a757-c569fd3a423c",  ## SUBSCRIBE_KEY
+    ENV['PUBNUB-PUB-KEY'],  ## PUBLISH_KEY
+    ENV['PUBNUB-SUB-KEY'],  ## SUBSCRIBE_KEY
     "",
     "",
     false    ## SSL_ON?
@@ -47,7 +47,7 @@ pubnub.subscribe({
       
       when "tapin"                                         
         
-        channels = JSON.parse RestClient.get "http://itap.dev/#{ENV['ITAPENV']}/channels.json", {:accept => :json}      
+        channels = JSON.parse RestClient.get "http://itap.#{ENV['ITAPENV']}/channels.json", {:accept => :json}      
         puts channels                                    
         if channels.has_key? device_id
           channel = Digest::MD5.hexdigest(channels[device_id])
