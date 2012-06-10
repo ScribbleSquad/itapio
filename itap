@@ -52,35 +52,39 @@ pubnub.subscribe({
         
       when "tapin"                                         
         
-        channels = JSON.parse RestClient.get "http://itap.#{ENV['ITAPENV']}/channels.json", {:accept => :json}      
-        puts channels                                    
-        if channels.has_key? device_id
-          channel = Digest::MD5.hexdigest(channels[device_id])
-          
-          info = pubnub.publish({
-            'channel'  => channel,
-            'message'  => "in"
-          })
-                                                       
-          puts "updated requestor!"
-     
-          info = pubnub.publish({
-            'channel'  => "itap_ios_ui",
-            'message'  => {device_id:device_id,body:"ok"}
-          })                       
-          
-          puts "updated the device"
+       begin
+                       
+          channels = JSON.parse RestClient.get "http://itap.#{ENV['ITAPENV']}/channels.json", {:accept => :json}      
+           puts channels                                    
+           if channels.has_key? device_id
+             channel = Digest::MD5.hexdigest(channels[device_id])
 
-          puts info
-        else
-          info = pubnub.publish({
-            'channel'  => "itap_ios_ui",
-            'message'  => {device_id:device_id,body: "not linked to any account"}
-          })
-          puts info
-          puts "not linked message sent"     
-        end
-        
+             info = pubnub.publish({
+               'channel'  => channel,
+               'message'  => "in"
+             })
+
+             puts "updated requestor!"
+
+             info = pubnub.publish({
+               'channel'  => "itap_ios_ui",
+               'message'  => {device_id:device_id,body:"ok"}
+             })                       
+
+             puts "updated the device"
+
+             puts info
+           else
+             info = pubnub.publish({
+               'channel'  => "itap_ios_ui",
+               'message'  => {device_id:device_id,body: "not linked to any account"}
+             })
+             puts info
+             puts "not linked message sent"     
+           end
+       rescue Exception => e
+         puts e
+       end     
       end
       return true   ## keep listening?
        
