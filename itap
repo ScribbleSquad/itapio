@@ -51,11 +51,11 @@ pubnub.subscribe({
         puts response   
         
       when "tapin"                                         
-        
-       begin
-                                                  
-          url ="http://itap.#{ENV['ITAPENV']}/api/channels.json"
-          puts "posting to #{url}"
+       puts "posting to #{url}"
+       url ="http://itap.#{ENV['ITAPENV']}/api/channels.json"
+       
+       begin                   
+          
           channels = JSON.parse RestClient.get url, {:accept => :json}      
            puts channels    
                                            
@@ -85,7 +85,8 @@ pubnub.subscribe({
              puts info
              puts "not linked message sent"     
            end
-       rescue Exception => e
+       rescue Exception => e    
+         puts url
          puts e
        end     
       end
