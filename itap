@@ -7,8 +7,8 @@ require 'digest/md5'
 require "pry"
 
 pubnub = Pubnub.new(
-    ENV['PUBNUB-PUB-KEY'],  ## PUBLISH_KEY
-    ENV['PUBNUB-SUB-KEY'],  ## SUBSCRIBE_KEY
+    ENV['PUBNUBPUBKEY'],  ## PUBLISH_KEY
+    ENV['PUBNUBSUBKEY'],  ## SUBSCRIBE_KEY
     "",
     "",
     false    ## SSL_ON?
