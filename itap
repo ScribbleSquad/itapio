@@ -51,11 +51,14 @@ pubnub.subscribe({
         puts response   
         
       when "tapin"                                         
-        
-       begin
-                       
-          channels = JSON.parse RestClient.get "http://itap.#{ENV['ITAPENV']}/channels.json", {:accept => :json}      
-           puts channels                                    
+       url ="http://itap.#{ENV['ITAPENV']}/api/channels.json"
+       puts "posting to #{url}"
+       
+       begin                   
+          
+          channels = JSON.parse RestClient.get url, {:accept => :json}      
+          puts channels    
+                                           
            if channels.has_key? device_id
              channel = Digest::MD5.hexdigest(channels[device_id])
 
@@ -82,7 +85,8 @@ pubnub.subscribe({
              puts info
              puts "not linked message sent"     
            end
-       rescue Exception => e
+       rescue Exception => e    
+         puts url
          puts e
        end     
       end
