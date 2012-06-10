@@ -4,7 +4,16 @@ require "pubnub"
 require 'rest_client'
 require 'json' 
 require 'digest/md5'
+require_relative 'version'
 require "pry"
+
+puts "Itap.io CLI"
+puts "VERSION: #{CLI::VERSION}"
+puts "ENV: #{ENV['ITAPENV']}" 
+puts "PUBNUB SUB KEY: #{ENV['PUBNUBSUBKEY']}"
+puts "PUBNUB PUB KEY: #{ENV['PUBNUBPUBKEY']}"
+
+puts "** >> started"
 
 pubnub = Pubnub.new(
     ENV['PUBNUBPUBKEY'],  ## PUBLISH_KEY
@@ -13,6 +22,8 @@ pubnub = Pubnub.new(
     "",
     false    ## SSL_ON?
 )                     
+
+
                              
 pubnub.subscribe({
     'channel'  => 'taps',
