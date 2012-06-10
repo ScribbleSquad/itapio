@@ -14,17 +14,6 @@ pubnub = Pubnub.new(
     false    ## SSL_ON?
 )                     
               
-
-
-
-devices = JSON.parse RestClient.get 'http://itap.io/devices.json', {:accept => :json}
-junction = {}
-devices.each do |device|
-	uuid = device["uuid"]
-	email= device["user"]["email"]
-	junction[uuid] = email
-end
-
 pubnub.subscribe({
     'channel'  => 'taps',
     'callback' => lambda do |message|
@@ -48,16 +37,35 @@ pubnub.subscribe({
         response = RestClient.post 'http://itap.io', "device[name]" => device_name, "device[uuid]" => device_id,:link_email => email
         puts response   
       when "tapin"
+        channels = JSON.parse RestClient.get 'http://itap.io/api/channels.json', {:accept => :json}      
+        puts channels                                    
+        if channels.has_key? device_id
+          channel = Digest::MD5.hexdigest(channels[device_id])
+          
+          info = pubnub.publish({
+            'channel'  => channel,
+            'message'  => "in"
+          })
+                                                       
+          puts "updated requestor!"
+     
+          info = pubnub.publish({
+            'channel'  => "itap_ios_ui",
+            'message'  => {device_id:device_id,body:"ok"}
+          })                       
+          
+          puts "updated the device"
+
+          puts info
+        else
+          info = pubnub.publish({
+            'channel'  => "itap_ios_ui",
+            'message'  => {device_id:device_id,body: "not linked to any account"}
+          })
+          puts info
+          puts "not linked message sent"     
+        end
         
-        channel = Digest::MD5.hexdigest(junction[device_id])
-        
-        
-        info = pubnub.publish({
-          'channel'  => channel,
-          'message'  => "in"
-        })     
-        
-        puts info
       end
       return true   ## keep listening?
        
