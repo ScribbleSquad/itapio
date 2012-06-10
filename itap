@@ -1,0 +1,83 @@
+#!/usr/bin/env ruby -rubygems
+
+require "pubnub" 
+require 'rest_client'
+require 'json' 
+require 'digest/md5'
+require "pry"
+
+pubnub = Pubnub.new(
+    ENV['PUBNUB-PUB-KEY'],  ## PUBLISH_KEY
+    ENV['PUBNUB-SUB-KEY'],  ## SUBSCRIBE_KEY
+    "",
+    "",
+    false    ## SSL_ON?
+)                     
+              
+pubnub.subscribe({
+    'channel'  => 'taps',
+    'callback' => lambda do |message|
+                                          
+      puts message
+      
+      device_id = message["device_id"]
+      puts "from #{device_id}"  
+      action = message["action"]
+      puts "action #{message["action"]}"
+      
+      case action
+      when "signup"             
+        email = message["email"]  
+        puts  email                               
+        device_name = message["device_name"]
+        puts device_name
+        device_id = message["device_id"]
+        puts device_id 
+                               
+        begin                           
+          url = "http://itap.#{ENV['ITAPENV']}/api/link"
+          puts "send to #{url}"
+          response = RestClient.post url, "device[name]" => device_name, "device[uuid]" => device_id,:link_email => email
+          puts response   
+          
+        rescue Exception => e
+          binding.pry
+        end
+        
+      
+      when "tapin"                                         
+        
+        channels = JSON.parse RestClient.get "http://itap.#{ENV['ITAPENV']}/channels.json", {:accept => :json}      
+        puts channels                                    
+        if channels.has_key? device_id
+          channel = Digest::MD5.hexdigest(channels[device_id])
+          
+          info = pubnub.publish({
+            'channel'  => channel,
+            'message'  => "in"
+          })
+                                                       
+          puts "updated requestor!"
+     
+          info = pubnub.publish({
+            'channel'  => "itap_ios_ui",
+            'message'  => {device_id:device_id,body:"ok"}
+          })                       
+          
+          puts "updated the device"
+
+          puts info
+        else
+          info = pubnub.publish({
+            'channel'  => "itap_ios_ui",
+            'message'  => {device_id:device_id,body: "not linked to any account"}
+          })
+          puts info
+          puts "not linked message sent"     
+        end
+        
+      end
+      return true   ## keep listening?
+       
+    end
+})
