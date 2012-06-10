@@ -3,4 +3,5 @@ source "https://rubygems.org"
 
 gem "pubnub" 
 gem "pry"
-gem "rest-client"
+gem "rest-client" 
+gem "daemons"

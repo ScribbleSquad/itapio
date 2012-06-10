@@ -4,6 +4,7 @@ GEM
     addressable (2.2.8)
     coderay (1.0.6)
     cookiejar (0.3.0)
+    daemons (1.1.8)
     em-http-request (1.0.2)
       addressable (>= 2.2.3)
       cookiejar
@@ -32,6 +33,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  daemons
   pry
   pubnub
   rest-client
