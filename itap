@@ -1,0 +1,65 @@
+#!/usr/bin/env ruby -rubygems
+
+require "pubnub" 
+require 'rest_client'
+require 'json' 
+require 'digest/md5'
+require "pry"
+
+pubnub = Pubnub.new(
+    "pub-c9eb2a6e-6135-4553-831f-ecd45ce9ae15",  ## PUBLISH_KEY
+    "sub-977100a6-9762-11e1-a757-c569fd3a423c",  ## SUBSCRIBE_KEY
+    "",
+    "",
+    false    ## SSL_ON?
+)                     
+              
+
+
+
+devices = JSON.parse RestClient.get 'http://itap.dev/devices.json', {:accept => :json}
+junction = {}
+devices.each do |device|
+	uuid = device["uuid"]
+	email= device["user"]["email"]
+	junction[uuid] = email
+end
+
+pubnub.subscribe({
+    'channel'  => 'taps',
+    'callback' => lambda do |message|
+                                          
+      puts message
+      
+      device_id = message["device_id"]
+      puts "from #{device_id}"  
+      action = message["action"]
+      puts "action #{message["action"]}"
+      
+      case action
+      when "signup"             
+        email = message["email"]  
+        puts  email                               
+        device_name = message["device_name"]
+        puts device_name
+        device_id = message["device_id"]
+        puts device_id 
+        
+        response = RestClient.post 'http://itap.dev/devices', "device[name]" => device_name, "device[uuid]" => device_id,:link_email => email
+        puts response   
+      when "tapin"
+        
+        channel = Digest::MD5.hexdigest(junction[device_id])
+        
+        
+        info = pubnub.publish({
+          'channel'  => channel,
+          'message'  => "in"
+        })     
+        
+        puts info
+      end
+      return true   ## keep listening?
+       
+    end
+})
