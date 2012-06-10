@@ -13,7 +13,7 @@ pubnub = Pubnub.new(
     "",
     false    ## SSL_ON?
 )                     
-              
+                             
 pubnub.subscribe({
     'channel'  => 'taps',
     'callback' => lambda do |message|
@@ -33,18 +33,12 @@ pubnub.subscribe({
         puts device_name
         device_id = message["device_id"]
         puts device_id 
-                               
-        begin                           
-          url = "http://itap.#{ENV['ITAPENV']}/api/link"
-          puts "send to #{url}"
-          response = RestClient.post url, "device[name]" => device_name, "device[uuid]" => device_id,:link_email => email
-          puts response   
-          
-        rescue Exception => e
-          binding.pry
-        end
+                             
+        url = "http://itap.#{ENV['ITAPENV']}/api/link"
+        puts "send to #{url}"
+        response = RestClient.post url, "device[name]" => device_name, "device[uuid]" => device_id,:link_email => email
+        puts response   
         
-      
       when "tapin"                                         
         
         channels = JSON.parse RestClient.get "http://itap.#{ENV['ITAPENV']}/channels.json", {:accept => :json}      
