@@ -51,13 +51,13 @@ pubnub.subscribe({
         puts response   
         
       when "tapin"                                         
-       puts "posting to #{url}"
        url ="http://itap.#{ENV['ITAPENV']}/api/channels.json"
+       puts "posting to #{url}"
        
        begin                   
           
           channels = JSON.parse RestClient.get url, {:accept => :json}      
-           puts channels    
+          puts channels    
                                            
            if channels.has_key? device_id
              channel = Digest::MD5.hexdigest(channels[device_id])
