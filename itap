@@ -45,7 +45,7 @@ pubnub.subscribe({
         device_id = message["device_id"]
         puts device_id 
         
-        response = RestClient.post 'http://itap.dev/io.json', "device[name]" => device_name, "device[uuid]" => device_id,:link_email => email
+        response = RestClient.post 'http://itap.io', "device[name]" => device_name, "device[uuid]" => device_id,:link_email => email
         puts response   
       when "tapin"
         
