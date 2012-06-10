@@ -13,7 +13,7 @@ pubnub = Pubnub.new(
     "",
     false    ## SSL_ON?
 )                     
-              
+                             
 pubnub.subscribe({
     'channel'  => 'taps',
     'callback' => lambda do |message|
